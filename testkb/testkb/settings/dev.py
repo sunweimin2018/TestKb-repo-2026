@@ -55,9 +55,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',#DRF
+
     'corsheaders',  # 解决跨域CORS
 
-    # 'users.apps.UsersConfig',  # 用户模块
+    'users.apps.UsersConfig',  # 用户模块
 ]
 
 MIDDLEWARE = [
@@ -217,16 +218,16 @@ LOGGING = {
     }
 }
 
-# # DRF配置项
-# REST_FRAMEWORK = {
-#     # 异常处理
-#     # 'EXCEPTION_HANDLER': 'testkb.utils.exceptions.exception_handler',
-# }
-#
+# DRF配置项
+REST_FRAMEWORK = {
+    # 异常处理
+    'EXCEPTION_HANDLER': 'testkb.utils.exceptions.exception_handler',
+}
+
 # # 修改Django认证系统的用户模型类
 # #  String model references must be of the form 'app_label.ModelName'.  应用.模型名
 # # AUTH_USER_MODEL = 'meiduo_mall.apps.users.models.User'
-# # AUTH_USER_MODEL = 'users.User'
+AUTH_USER_MODEL = 'users.User'
 #
 #
 # # CORS  追加白名单
