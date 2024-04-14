@@ -1,3 +1,4 @@
+# 开发阶段项目文件
 """
 Django settings for testkb project.
 
@@ -10,22 +11,37 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
-import os
+import os,sys
+# os.path  拼接路径
+# sys.path 查询导包路径的
 
+# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+# /Users/chao/Desktop/meiduo_24/meiduo_mall/meiduo_mall
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# print(BASE_DIR)
+
+# ['/Users/chao/Desktop/meiduo_24/meiduo_mall', '/Users/chao/Desktop/meiduo_24', '/Users/chao/.virtualenvs/meiduo/lib/python36.zip', '/Users/chao/.virtualenvs/meiduo/lib/python3.6', '/Users/chao/.virtualenvs/meiduo/lib/python3.6/lib-dynload', '/usr/local/Cellar/python3/3.6.2/Frameworks/Python.framework/Versions/3.6/lib/python3.6', '/Users/chao/.virtualenvs/meiduo/lib/python3.6/site-packages', '/Applications/PyCharm.app/Contents/helpers/pycharm_matplotlib_backend']
+# 追加系统的导包路径(目的: 1.注册子应用时 可以写的方便点, 2.修改django认证模型类时,必须以 应用名.模型名)
+sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
+
+# sys.path.insert(0, BASE_DIR + '/apps')
+# ['/Users/chao/Desktop/meiduo_24/meiduo_mall/meiduo_mall/apps', '/Users/chao/Desktop/meiduo_24/meiduo_mall', '/Users/chao/Desktop/meiduo_24', '/Users/chao/.virtualenvs/meiduo/lib/python36.zip', '/Users/chao/.virtualenvs/meiduo/lib/python3.6', '/Users/chao/.virtualenvs/meiduo/lib/python3.6/lib-dynload', '/usr/local/Cellar/python3/3.6.2/Frameworks/Python.framework/Versions/3.6/lib/python3.6', '/Users/chao/.virtualenvs/meiduo/lib/python3.6/site-packages', '/Applications/PyCharm.app/Contents/helpers/pycharm_matplotlib_backend']
+# print(sys.path)
+# 'meiduo_mall.apps.users.apps.UsersConfig'
+# 'users.apps.UsersConfig'
+
 
 # Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
+# See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'qw02w@_3uf9i)a69wj=f902n8$aw-fh1bzd-2a61mk))6as4=t'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
+# 允许那些域名访问Django
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'www.testkb.site', 'api.testkb.site']
 
 
 # Application definition
@@ -37,9 +53,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'rest_framework',#DRF
+    'corsheaders',  # 解决跨域CORS
+
+    # 'users.apps.UsersConfig',  # 用户模块
 ]
 
 MIDDLEWARE = [
+'corsheaders.middleware.CorsMiddleware',  # 最外层的中间件
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -75,14 +97,18 @@ WSGI_APPLICATION = 'testkb.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'HOST': '127.0.0.1',  # 数据库主机
+        'PORT': 3306,  # 数据库端口
+        'USER': 'testkb',  # 数据库用户名
+        'PASSWORD': 'testkb',  # 数据库用户密码
+        'NAME': 'testkb'  # 数据库名字
     }
 }
 
 
 # Password validation
-# https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
+# https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -101,7 +127,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 # Internationalization
-# https://docs.djangoproject.com/en/2.1/topics/i18n/
+# https://docs.djangoproject.com/en/1.11/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
@@ -115,6 +141,99 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/2.1/howto/static-files/
+# https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+# 配置redis数据库作为缓存后端
+CACHES = {
+    "default": {  # 缓存省市区数据
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/0",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    },
+    "session": {  # 缓存session
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    },
+    "verify_codes": {   # 存储验证码
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/2",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    },
+
+}
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_CACHE_ALIAS = "session"
+
+
+# 日志
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,  # 是否禁用已经存在的日志器
+    'formatters': {  # 日志信息显示的格式
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(lineno)d %(message)s'
+        },
+        'simple': {
+            'format': '%(levelname)s %(module)s %(lineno)d %(message)s'
+        },
+    },
+    'filters': {  # 对日志进行过滤
+        'require_debug_true': {  # django在debug模式下才输出日志
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+    },
+    'handlers': {  # 日志处理方法
+        'console': {  # 向终端中输出日志
+            'level': 'INFO',
+            'filters': ['require_debug_true'],
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+        },
+        'file': {  # 向文件中输出日志
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(os.path.dirname(BASE_DIR), "logs/testkb.log"),  # 日志文件的位置
+            'maxBytes': 300 * 1024 * 1024,
+            'backupCount': 10,
+            'formatter': 'verbose'
+        },
+    },
+    'loggers': {  # 日志器
+        'django': {  # 定义了一个名为django的日志器
+            'handlers': ['console', 'file'],  # 可以同时向终端与文件中输出日志
+            'propagate': True,  # 是否继续传递日志信息
+            'level': 'INFO',  # 日志器接收的最低日志级别
+        },
+    }
+}
+
+# # DRF配置项
+# REST_FRAMEWORK = {
+#     # 异常处理
+#     # 'EXCEPTION_HANDLER': 'testkb.utils.exceptions.exception_handler',
+# }
+#
+# # 修改Django认证系统的用户模型类
+# #  String model references must be of the form 'app_label.ModelName'.  应用.模型名
+# # AUTH_USER_MODEL = 'meiduo_mall.apps.users.models.User'
+# # AUTH_USER_MODEL = 'users.User'
+#
+#
+# # CORS  追加白名单
+# CORS_ORIGIN_WHITELIST = (
+#     '127.0.0.1:8080',
+#     'localhost:8080',
+#     'www.testkb.site:8080',
+#     'api.testkb.site:8000'
+# )
+# CORS_ALLOW_CREDENTIALS = True  # 跨域时允许携带cookie
