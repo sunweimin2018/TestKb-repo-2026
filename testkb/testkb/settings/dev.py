@@ -11,7 +11,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
-import os,sys
+import os, sys
+
 # os.path  拼接路径
 # sys.path 查询导包路径的
 
@@ -43,10 +44,10 @@ SECRET_KEY = 'qw02w@_3uf9i)a69wj=f902n8$aw-fh1bzd-2a61mk))6as4=t'
 # 允许那些域名访问Django
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'www.testkb.site', 'api.testkb.site']
 
-
 # Application definition
 
 INSTALLED_APPS = [
+    # 'simpleui',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -54,7 +55,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'rest_framework',#DRF
+    'rest_framework',  # DRF
 
     'corsheaders',  # 解决跨域CORS
 
@@ -62,7 +63,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-'corsheaders.middleware.CorsMiddleware',  # 最外层的中间件
+    'corsheaders.middleware.CorsMiddleware',  # 最外层的中间件
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -92,7 +93,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'testkb.wsgi.application'
 
-
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
@@ -106,7 +107,6 @@ DATABASES = {
         'NAME': 'testkb'  # 数据库名字
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
@@ -126,7 +126,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
 
@@ -140,12 +139,10 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
-
 
 # 配置redis数据库作为缓存后端
 CACHES = {
@@ -163,7 +160,7 @@ CACHES = {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
     },
-    "verify_codes": {   # 存储验证码
+    "verify_codes": {  # 存储验证码
         "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": "redis://127.0.0.1:6379/2",
         "OPTIONS": {
@@ -174,7 +171,6 @@ CACHES = {
 }
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "session"
-
 
 # 日志
 LOGGING = {
@@ -231,10 +227,10 @@ AUTH_USER_MODEL = 'users.User'
 #
 #
 # # CORS  追加白名单
-# CORS_ORIGIN_WHITELIST = (
-#     '127.0.0.1:8080',
-#     'localhost:8080',
-#     'www.testkb.site:8080',
-#     'api.testkb.site:8000'
-# )
-# CORS_ALLOW_CREDENTIALS = True  # 跨域时允许携带cookie
+CORS_ORIGIN_WHITELIST = (
+    'http://127.0.0.1:8080',
+    'http://localhost:8080',
+    'http://www.testkb.site:8080',
+    'http://api.testkb.site:8000'
+)
+CORS_ALLOW_CREDENTIALS = True  # 跨域时允许携带cookie
