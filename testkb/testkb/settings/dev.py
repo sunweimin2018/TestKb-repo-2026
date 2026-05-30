@@ -11,6 +11,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
+import datetime
 import os, sys
 
 # os.path  拼接路径
@@ -20,9 +21,7 @@ import os, sys
 # /Users/chao/Desktop/meiduo_24/meiduo_mall/meiduo_mall
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-# print(BASE_DIR)
-
+print(BASE_DIR)
 # ['/Users/chao/Desktop/meiduo_24/meiduo_mall', '/Users/chao/Desktop/meiduo_24', '/Users/chao/.virtualenvs/meiduo/lib/python36.zip', '/Users/chao/.virtualenvs/meiduo/lib/python3.6', '/Users/chao/.virtualenvs/meiduo/lib/python3.6/lib-dynload', '/usr/local/Cellar/python3/3.6.2/Frameworks/Python.framework/Versions/3.6/lib/python3.6', '/Users/chao/.virtualenvs/meiduo/lib/python3.6/site-packages', '/Applications/PyCharm.app/Contents/helpers/pycharm_matplotlib_backend']
 # 追加系统的导包路径(目的: 1.注册子应用时 可以写的方便点, 2.修改django认证模型类时,必须以 应用名.模型名)
 sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
@@ -39,7 +38,7 @@ sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'qw02w@_3uf9i)a69wj=f902n8$aw-fh1bzd-2a61mk))6as4=t'
-
+DEBUG = True
 # SECURITY WARNING: don't run with debug turned on in production!
 # 允许那些域名访问Django
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'www.testkb.site', 'api.testkb.site']
@@ -60,6 +59,13 @@ INSTALLED_APPS = [
     'corsheaders',  # 解决跨域CORS
 
     'users.apps.UsersConfig',  # 用户模块
+    # 'verifications.apps.VerificationsConfig'
+
+    #
+    'rest_framework_simplejwt',
+    # # 下面这个app用于刷新refresh_token后，将旧的加到到blacklist时使用
+    # # 'rest_framework_simplejwt.token_blacklist'
+
 ]
 
 MIDDLEWARE = [
@@ -129,9 +135,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
+LANGUAGE_CODE = 'zh-hans'
+TIME_ZONE = 'Asia/Shanghai'
+# TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
@@ -218,6 +224,13 @@ LOGGING = {
 REST_FRAMEWORK = {
     # 异常处理
     'EXCEPTION_HANDLER': 'testkb.utils.exceptions.exception_handler',
+
+    # 新加的
+    # 'DEFAULT_AUTHENTICATION_CLASSES': 'rest_framework_simplejwt.authentication.JWTAuthentication',
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',  # 必须配置的认证类
+
+    ],
 }
 
 # # 修改Django认证系统的用户模型类
@@ -228,9 +241,47 @@ AUTH_USER_MODEL = 'users.User'
 #
 # # CORS  追加白名单
 CORS_ORIGIN_WHITELIST = (
+
     'http://127.0.0.1:8080',
     'http://localhost:8080',
     'http://www.testkb.site:8080',
-    'http://api.testkb.site:8000'
+    'http://api.testkb.site:8000',
 )
 CORS_ALLOW_CREDENTIALS = True  # 跨域时允许携带cookie
+from datetime import timedelta
+
+# JWT的有效期
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),  # Access Token的有效期
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),  # Refresh Token的有效期
+    "AUTH_HEADER_TYPES": ("JWT",),
+}
+# # 修改Django用户认证后端类
+AUTHENTICATION_BACKENDS = ['users.utils.UsernameMobileAuthBackend']
+
+
+# QQ登录参数
+# QQ_CLIENT_ID = '101514053'
+# QQ_CLIENT_SECRET = '1075e75648566262ea35afa688073012'
+# QQ_REDIRECT_URI = 'http://www.meiduo.site:8080/oauth_callback.html'
+
+
+# 以下是邮件配置
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.163.com'
+EMAIL_PORT = 25
+#发送邮件的邮箱
+EMAIL_HOST_USER = 'sunweiimin@163.com'
+#在邮箱中设置的客户端授权密码
+EMAIL_HOST_PASSWORD = 'WYIMJIKKCNGMSAAK'
+#收件人看到的发件人
+EMAIL_FROM = 'python<sunweiimin@163.com>'
+
+
+# DRF扩展配置省市区数据缓存
+REST_FRAMEWORK_EXTENSIONS = {
+    # 缓存时间
+    'DEFAULT_CACHE_RESPONSE_TIMEOUT': 60 * 60,
+    # 缓存存储
+    'DEFAULT_USE_CACHE': 'default',
+}

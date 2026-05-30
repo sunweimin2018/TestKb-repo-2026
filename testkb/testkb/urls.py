@@ -13,19 +13,31 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.conf.urls import  include
+# from django.conf.urls import  include
 
-from django.urls import re_path as url
+from django.urls import re_path,path
 from django.contrib import admin
-from django.urls import path
+from django.urls import path,include
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,  # 双token
+    TokenRefreshView,
+    TokenObtainSlidingView,  # 下面两个是单token，用法一样
+    TokenRefreshSlidingView, TokenVerifyView
+)
+
+
 # from book import views
 
 urlpatterns = [
-    # path('admin/', admin.site.urls),
-    url(r'^admin/', admin.site.urls),
-    url(r'^', include('verifications.urls')),  # 发短信模块
-    # path('book/',views . book)
+    path('admin/', admin.site.urls),
+    path('', include('verifications.urls')),  # 发短信模块
+    path('', include('users.urls')),  # 发短信模块
 
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    # 刷新JWT
+    path('api/v1/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    # 验证token
+    path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
 ]
 
 

@@ -27,6 +27,7 @@ var vm = new Vue({
                     // 加载用户数据
                     this.user_id = response.data.id;
                     this.username = response.data.username;
+                    alert(this.username )
                     this.mobile = response.data.mobile;
                     this.email = response.data.email;
                     this.email_active = response.data.email_active;
