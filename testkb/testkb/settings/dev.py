@@ -141,8 +141,6 @@ TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
 
-USE_L10N = True
-
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
@@ -240,8 +238,7 @@ AUTH_USER_MODEL = 'users.User'
 #
 #
 # # CORS  追加白名单
-CORS_ORIGIN_WHITELIST = (
-
+CORS_ALLOWED_ORIGINS = (
     'http://127.0.0.1:8080',
     'http://localhost:8080',
     'http://www.testkb.site:8080',

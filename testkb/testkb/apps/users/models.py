@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from itsdangerous import TimedJSONWebSignatureSerializer as TJWSSerializer, BadData
-# from itsdangerous import TimedSerializer as TJWSSerializer,BadData
+from itsdangerous import URLSafeTimedSerializer as TJWSSerializer, BadData
 from django.conf import settings
 # from testkb.utils.models import BaseModel
 # Create your models here.
@@ -20,24 +19,17 @@ class User(AbstractUser):
 
     def generate_email_verify_url(self):
         """生成邮箱激活链接"""
-        # 1.创建加密序列化器
-        serializer = TJWSSerializer(settings.SECRET_KEY, 3600 * 24)
-
-        # 2.调用dumps方法进行加密, bytes
+        serializer = TJWSSerializer(settings.SECRET_KEY)
         data = {'user_id': self.id, 'email': self.email}
-        token = serializer.dumps(data).decode()
-
-        # 3.拼接激活url
+        token = serializer.dumps(data)
         return 'http://127.0.0.1:8080/success_verify_email.html?token=' + token
 
     @staticmethod
     def check_verify_email_token(token):
         """对token解密并查询对应的user"""
-        # 1.创建加密序列化器
-        serializer = TJWSSerializer(settings.SECRET_KEY, 3600 * 24)
-        # 2.调用loads解密
+        serializer = TJWSSerializer(settings.SECRET_KEY)
         try:
-            data = serializer.loads(token)
+            data = serializer.loads(token, max_age=3600 * 24)
         except BadData:
             return None
         else:
